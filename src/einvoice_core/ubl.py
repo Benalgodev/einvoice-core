@@ -6,7 +6,7 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-from .model import AllowanceCharge, Invoice, InvoiceLine, Party, VatCategory
+from .model import AllowanceCharge, DeclaredTotals, Invoice, InvoiceLine, Party, VatCategory
 
 NS = {
     "cbc": "urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2",
@@ -21,6 +21,11 @@ def _t(el: ET.Element, path: str, default: str | None = None) -> str | None:
 
 def _d(el: ET.Element, path: str, default: str = "0") -> Decimal:
     return Decimal(_t(el, path, default))
+
+
+def _opt(el: ET.Element, path: str) -> Decimal | None:
+    txt = _t(el, path)
+    return Decimal(txt) if txt is not None else None
 
 
 def _party(el: ET.Element | None) -> Party:
@@ -71,4 +76,13 @@ def read_ubl(source: str | Path | bytes) -> Invoice:
         allowances_charges=acs,
         prepaid_amount=_d(root, "cac:LegalMonetaryTotal/cbc:PrepaidAmount"),
         rounding_amount=_d(root, "cac:LegalMonetaryTotal/cbc:PayableRoundingAmount"),
+        declared=DeclaredTotals(
+            line_total=_opt(root, "cac:LegalMonetaryTotal/cbc:LineExtensionAmount"),
+            allowance_total=_opt(root, "cac:LegalMonetaryTotal/cbc:AllowanceTotalAmount"),
+            charge_total=_opt(root, "cac:LegalMonetaryTotal/cbc:ChargeTotalAmount"),
+            tax_exclusive=_opt(root, "cac:LegalMonetaryTotal/cbc:TaxExclusiveAmount"),
+            tax_total=_opt(root, "cac:TaxTotal/cbc:TaxAmount"),
+            tax_inclusive=_opt(root, "cac:LegalMonetaryTotal/cbc:TaxInclusiveAmount"),
+            payable=_opt(root, "cac:LegalMonetaryTotal/cbc:PayableAmount"),
+        ),
     )

@@ -67,6 +67,18 @@ class InvoiceLine:
 
 
 @dataclass
+class DeclaredTotals:
+    """Totaux tels que déclarés dans le document (BG-22) ; None = absent du fichier."""
+    line_total: Decimal | None = None       # BT-106
+    allowance_total: Decimal | None = None  # BT-107
+    charge_total: Decimal | None = None     # BT-108
+    tax_exclusive: Decimal | None = None    # BT-109
+    tax_total: Decimal | None = None        # BT-110
+    tax_inclusive: Decimal | None = None    # BT-112
+    payable: Decimal | None = None          # BT-115
+
+
+@dataclass
 class Invoice:
     number: str                     # BT-1
     issue_date: date                # BT-2
@@ -79,3 +91,4 @@ class Invoice:
     exemption_reasons: dict[VatCategory, str] = field(default_factory=dict)  # BT-120/121
     prepaid_amount: Decimal = Decimal(0)     # BT-113
     rounding_amount: Decimal = Decimal(0)    # BT-114
+    declared: DeclaredTotals = field(default_factory=DeclaredTotals)

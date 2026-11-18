@@ -6,4 +6,5 @@
 - `check_totals(inv, tolerance)` → liste de `Finding` (règle BR-CO-10..16, BT, déclaré, calculé).
 - Piège : catégorie ≠ S impose taux 0 (ValueError dans compute_totals).
 - Données de test fictives uniquement (tests/fixtures).
-- Suite : lecture CII (ROADMAP), réutiliser `DeclaredTotals` pour le parseur CII.
+- `read_cii` : XPath BT→CII dans cii.py ; dates format 102 seul ; CII et UBL de test donnent le même `Invoice`.
+- Suite : écriture UBL/CII depuis le modèle (round-trip avec les lecteurs).
